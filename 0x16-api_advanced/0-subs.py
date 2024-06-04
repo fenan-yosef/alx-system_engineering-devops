@@ -3,7 +3,7 @@ import requests
 
 def number_of_subscribers(subreddit):
     #THIS CODE RETURN TOP TEN SUBSCRIBERS OF REDDIT
-    alx_redditUrl = f"https://www.reddit.com/r/{subreddit}/about.json"
+    alx_redditUrl = f"https://www.reddit.com/r/UnresolvedMysteries/about.json"
     yRED = {"User-Agent": "python:subreddit.subscriber.count:v1.0 (by /u/yourusername)"}
     try:
         response = requests.get(alx_redditUrl, headers=yRED, allow_redirects=False)
