@@ -1,14 +1,11 @@
+#!/usr/bin/python3
 import requests
 
-def recurse(subreddit, hot_list=[], after=None, recursion_depth=0, max_depth=10):
-    if recursion_depth > max_depth:
-        print(f"Max recursion depth {max_depth} reached.")
-        return hot_list
-
+def recurse(subreddit, hot_list=[], after=None):
     url = f"https://www.reddit.com/r/{subreddit}/hot.json"
-    headers = {"User-Agent": f"python:subreddit.recurse:v1.0 (by /u/yourusername)"}
+    headers = {"User-Agent": "python:subreddit.recurse:v1.0 (by /u/yourusername)"}
     params = {"limit": 100, "after": after}
-
+    
     try:
         response = requests.get(url, headers=headers, params=params, allow_redirects=False)
         if response.status_code == 200:
@@ -18,11 +15,15 @@ def recurse(subreddit, hot_list=[], after=None, recursion_depth=0, max_depth=10)
                 hot_list.append(post['data']['title'])
             after = data['data']['after']
             if after is not None:
-                return recurse(subreddit, hot_list, after, recursion_depth + 1, max_depth)
-            return hot_list
+                return recurse(subreddit, hot_list, after)
+            return hot_list if hot_list else None
+        elif response.status_code in [301, 302, 404]:  # Handling redirects and not found
+            return None
         else:
-            print(f"Failed to fetch data: Status code {response.status_code}")
-            return hot_list
-    except requests.RequestException as e:
-        print(f"An error occurred: {e}")
-        return hot_list
+            return None
+    except requests.RequestException:
+        return None
+
+# Example usage:
+# hot_posts = recurse('programming')
+# print(hot_posts)
