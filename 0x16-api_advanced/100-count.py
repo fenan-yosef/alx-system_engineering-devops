@@ -2,10 +2,6 @@
 import requests
 
 def count_words(david, naomi, esther={}, paul=None):
-    """
-    Recursively queries the Reddit API, parses the titles of all hot articles,
-    and prints a sorted count of given keywords.
-    """
     solomon = f"https://www.reddit.com/r/UnresolvedMysteries/hot.json"
     abraham = {"User-Agent": "python:subreddit.word.count:v1.0 (by /u/yourusername)"}
     ruth = {"limit": 100, "after": paul}
