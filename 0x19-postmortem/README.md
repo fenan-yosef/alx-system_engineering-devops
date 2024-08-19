@@ -1,26 +1,31 @@
-Postmortem: Outage of the "InstantChat" Messaging Service
+Postmortem: The Day InstantChat Took a "Lunch Break"
+
 Issue Summary
 Duration:
-The outage occurred on August 12, 2024, from 14:30 UTC to 15:15 UTC (45 minutes).
+On August 12, 2024, from 14:30 UTC to 15:15 UTC, InstantChat decided to take an unplanned 45-minute "lunch break."
+
 Impact:
-The "InstantChat" messaging service experienced a complete outage, preventing 90% of users from sending or receiving messages. Additionally, 100% of users were unable to log in during this time. Approximately 1.2 million users were affected globally.
+During this time, 90% of users were left in the digital equivalent of an awkward silence—unable to send or receive messages. Everyone was also locked out, with 100% of users unable to log in. So, around 1.2 million people globally found themselves on an unexpected "social media detox."
+
 Root Cause:
-A misconfiguration in the database connection pool settings caused the primary database cluster to become overwhelmed, leading to a cascading failure across the entire service.
+The root cause? A well-intentioned but misguided configuration change that throttled our database connection pool. Picture a crowded cafeteria with only one lunch lady serving—chaos ensued.
 
 Timeline
-14:30 UTC - Issue detected: Automated monitoring systems flagged a spike in database query latency.
-14:32 UTC - Initial investigation began: The DevOps team noticed that the primary database cluster was showing increased load and latency.
-14:35 UTC - Incident escalated: The issue was escalated to the on-call database administrator (DBA).
-14:40 UTC - Misleading path: The DBA initially suspected a DDoS attack due to the sudden spike in load and began analysing network traffic.
-14:45 UTC - Further investigation: After ruling out DDoS, the team began checking application logs and found frequent database connection timeouts.
-14:50 UTC - Root cause identified: The team discovered a recent configuration change in the database connection pool settings that reduced the maximum number of connections.
-15:00 UTC - Resolution initiated: The connection pool settings were reverted to previous values.
-15:10 UTC - Service recovery: The database cluster gradually returned to normal operation, and the messaging service began processing messages again.
-15:15 UTC - Full service restored: All users could log in and send/receive messages without issues.
-
+14:30 UTC - Detection: Our monitoring system screamed for help, reporting that our database was moving slower than a snail on vacation.
+14:32 UTC - Initial Investigation: The DevOps team realized something was seriously wrong with the database cluster—it was under more pressure than a Monday morning.
+14:35 UTC - Escalation: The on-call DBA was summoned like a superhero to the scene.
+14:40 UTC - The DDoS Decoy: Suspecting an attack, the team chased a red herring, thinking we were under a DDoS siege. Spoiler alert: We weren't.
+14:45 UTC - Course Correction: Application logs revealed the real culprit—database connection timeouts.
+14:50 UTC - Eureka Moment: The team discovered that our database connection pool had been unintentionally starved. It was like trying to squeeze a river through a straw.
+15:00 UTC - Fixing the Faucet: The team reverted the connection pool settings, allowing the database to breathe again.
+15:10 UTC - Recovery: Like magic, the database started catching up, and messages began to flow.
+15:15 UTC - All Clear: Full service was restored, and users were once again free to chat about their cat videos and weekend plans.
 Root Cause and Resolution
-Root Cause: The outage was caused by an incorrect change in the configuration of the database connection pool settings. Specifically, the maximum number of connections allowed per application instance was reduced from 100 to 10 during a routine configuration update. This reduction was intended to alleviate pressure on the database during peak hours, but it inadvertently led to the database being unable to handle the incoming connections from all active application instances. The sudden reduction in available connections caused a bottleneck, leading to increased query latency and eventual timeouts. This overwhelmed the primary database cluster, which in turn caused a complete service outage.
-Resolution: Upon identifying the root cause, the team reverted the database connection pool settings to their original values. This allowed the database to once again handle the required number of connections, relieving the bottleneck and restoring normal operation. Additionally, the team manually restarted the affected database nodes to ensure a full recovery. The service was fully restored within 45 minutes of the initial outage.
+Root Cause:
+Our database connection pool settings were the villain of this story. During a routine configuration update, someone thought it would be smart to reduce the maximum number of connections from 100 to 10. Imagine a busy coffee shop suddenly reducing their baristas from 10 to 1—chaos! The reduced connection capacity couldn't handle the demand, leading to delays, timeouts, and ultimately, a full-blown outage.
+
+Resolution:
+Once we identified the bottleneck, we promptly reverted the connection pool settings back to 100 connections. With the database now able to handle the traffic, everything returned to normal. We also gave the database nodes a gentle reboot, ensuring they were refreshed and ready to go.
 
 Corrective and Preventative Measures
 Improvements Needed:
